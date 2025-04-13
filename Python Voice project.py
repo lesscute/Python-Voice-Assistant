@@ -6,6 +6,8 @@ import datetime
 import pyjokes
 import pyttsx3
 import requests  # Import requests to make API calls
+from dotenv import load_dotenv
+import os
 import re
 
 # GUI for voice command history
@@ -24,15 +26,15 @@ def process_command(command):
     """Process the recognized command."""
     if command.lower() == "quit":
         return False
-    elif "what time is it" in command.lower():
+    elif "what time is it" in command.lower(): #provides system time
         current_time = datetime.datetime.now().strftime("%H:%M")
         print(current_time)
         engine = pyttsx3.init()
-        engine.say(current_time)
+        engine.say(current_time) # Use text-to-speech 
         engine.runAndWait()
     elif "set timer" in command.lower():
         set_timer(command)  # Set timer based on the command
-    elif "search" in command.lower():
+    elif "search" in command.lower(): # searches the interwebs specifically google.
         search_query = command.split(" ")[1:]
         webbrowser.open(f"https://www.google.com/search?q={' '.join(search_query)}")
     elif "tell a joke" in command.lower():
@@ -43,10 +45,11 @@ def process_command(command):
         engine.runAndWait()
     elif "weather" in command.lower():
         get_weather("Lewiston, Maine")  # Get weather for Lewiston, Maine
+
     elif "text to speech" in command.lower():
         text_to_speak = input("Enter text to speak: ")
         engine = pyttsx3.init()
-        engine.say(text_to_speak)
+        engine.say(text_to_speak) # Use text-to-speech 
         engine.runAndWait()
     else:
         history_text.insert(tk.END, f"{command}\n")
@@ -55,7 +58,7 @@ def process_command(command):
 
 def get_weather(city):
     """Fetch and announce the weather for the specified city."""
-    api_key = "8512cfab5a846c22ac03704ee1c61f9e"  # Replace with your OpenWeatherMap API key
+    api_key = os.getenv("API_KEY")
     url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=imperial"  # Use imperial for Fahrenheit
     response = requests.get(url)
     data = response.json()
@@ -65,6 +68,9 @@ def get_weather(city):
         weather = data["weather"][0]["description"]
         temp = main["temp"]
         weather_report = f"The current temperature in {city} is {temp:.1f}°F with {weather}."
+        engine = pyttsx3.init()
+        engine.say(f"The current temperature in {city} is {temp:.1f}°F with {weather}.") # Use text-to-speech 
+        engine.runAndWait()
         print(weather_report)
 
 def set_timer(command):
@@ -94,7 +100,7 @@ def set_timer(command):
         
         print(f"Timer set for {minutes} minutes.")
         engine = pyttsx3.init()
-        engine.say(f"Timer set for {minutes} minutes.")
+        engine.say(f"Timer set for {minutes} minutes.") # Use text-to-speech 
         engine.runAndWait()
         
         # Countdown loop
@@ -103,7 +109,7 @@ def set_timer(command):
             time.sleep(1)  # Wait for 1 second
         
         print("Timer complete!")
-        engine.say("Timer complete!")
+        engine.say("Timer complete!") # Use text-to-speech 
         engine.runAndWait()
     else:
         print("I couldn't understand the timer duration.")
@@ -140,4 +146,4 @@ with sr.Microphone() as source:
         except sr.RequestError as e:
             print(f"Could not request results; {e}")
 
-root.mainloop()
+root.mainloop() 
